@@ -1,0 +1,15 @@
+
+{% macro build_site_navigation(pages, selected) %}
+
+
+
+  <a href="#"><i class="fas fa-home"></i> About</a>
+  <a href="#"><i class="fas fa-address-book"></i> Services</a>
+  <a href="#"><i class="fas fa-air-freshener"></i> Clients</a>
+  <a href="#"><i class="fas fa-allergies"></i> Contact</a>
+   {% for page in pages %}
+        <a href="{{page.url}}"><i class="fas fa-ambulance"></i> {{page.name}}</a>
+    {% endfor %}
+
+
+{% endmacro %}

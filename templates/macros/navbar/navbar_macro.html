@@ -1,0 +1,80 @@
+{% macro build_site_navbar(current_user, selected) %}
+
+<!--<header class="site-header">-->
+<nav class="navbar navbar-expand-lg bg-light">
+  <div class="container-fluid">
+            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling"
+        aria-controls="offcanvasScrolling">
+        &#9776
+      </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+      <form class="d-flex">
+        <input class="form-control me-2" id = "SearchFrom" type="search" placeholder="Buscar Servicios ML" aria-label="Search">
+      </form>
+
+      <!-- Navbar Right Side -->
+      <ul class="navbar-nav ms-auto">
+        <!-- Help -->
+        <li class="nav-item dropdown">
+          <a class="nav-link d-flex align-items-center hidden-arrow" href="#"
+            id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-que stion-circle-fill"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+            <li><a class="dropdown-item" href="#">Sporte</a></li>
+            <li><a class="dropdown-item" href="#">Buscar en la documentación</a></li>
+            <li><a class="dropdown-item" href="#">Guias de arquitectura ML</a></li>
+            <li><a class="dropdown-item" href="#">FAQs</a></li>
+            <li><a class="dropdown-item" href="#">Tutoriales</a></li>
+          </ul>
+        </li>
+        <!-- Notifications -->
+        <li class="nav-item dropdown">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+
+
+          <a class="nav-link d-flex align-items-center hidden-arrow" href="#"
+            id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-bell-fill"></i>
+            {% if messages|length != 0 %}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ messages|length }}</span>
+            {% endif %}
+          </a>
+
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            <li><a class="dropdown-item" href="#">{{ message }}</a></li>
+          </div>
+          {% endfor %}
+          </ul>
+
+          {% endwith %}
+        </li>
+          <!-- Avatar -->
+        <li class="nav-item"><span class="placeholder"></span> </li>
+        <li class="nav-item dropdown">
+
+          <a class="nav-link d-flex align-items-center hidden-arrow" href="#"
+            id="navbarDropdownMenuAvatar" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
+            {% if current_user.is_authenticated %}
+            <li class="nav-item"><a class="dropdown-item" href="{{ url_for('users.account') }}">Account</a></li>
+            <li class="nav-item"><a class="dropdown-item" href="{{ url_for('users.logout') }}">Logout</a></li>
+            {% else %}
+            <li class="nav-item"><a class="dropdown-item" href="{{ url_for('users.login') }}">Login</a></li>
+            <li class="nav-item"><a class="dropdown-item" href="{{ url_for('users.register') }}">Register</a></li>
+            {% endif %}
+          </ul>
+
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<!--</header>-->
+
+{% endmacro %}
