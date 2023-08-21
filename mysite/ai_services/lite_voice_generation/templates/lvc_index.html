@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Random News Article</title>
+</head>
+<body>
+	<h1>{{ article_title }}</h1>
+	<p>{{ article_body }}</p>
+	<audio controls>
+		<source src="{{ url_for('lvc.static', filename='audio/' + audio_file) }}" type="audio/mpeg">
+	</audio>
+</body>
+</html>

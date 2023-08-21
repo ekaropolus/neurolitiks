@@ -1,0 +1,9 @@
+{% extends "base/layout.html" %}
+{% block content %}
+
+{% import "/macros/forms/forms_macro.html" as macros %}
+{{macros.form_service(current_user=current_user, form=form)}}
+
+
+
+{% endblock%}

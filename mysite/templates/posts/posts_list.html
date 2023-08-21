@@ -1,0 +1,39 @@
+{% extends "base/layout.html" %}
+{% block content %}
+
+    {% for post in posts.items %}
+        <div class="card" style="width: 18rem;">
+          <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_images/' + post.author.image_file) }}">
+          <div class = "card-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="#">{{ post.author.username }}</a>
+              <small class="text-muted">{{ post.date_posted.strftime('%d-%m-%Y') }}</small>
+            </div>
+            <h2><a class="card-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
+            <p class="card-text">{{ post.content }}</p>
+          </div>
+        </div>
+    {% endfor %}
+
+    <div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <img class="rounded-circle article-img" src="https://www.canva.com/design/DAFaBatUINM/watch">
+    <h5 class="card-title">Hadox Human Networks</h5>
+    <h6 class="card-subtitle mb-2 text-muted">Reinforcement Machine Learning</h6>
+    <p class="card-text">Algoritmo RL para tratamiento personalizado</p>
+    <h5 class="card-title">TRANSFORMA EL CUIDADO DE LA SALUD</h5>
+    <p class="card-text">Con el poder del aprendizaje reforzado, podemos personalizar los tratamientos para cada paciente.</p>
+    <a href="#" class="btn btn-primary">Transforma tu empresa</a>
+  </div>
+</div>
+    {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2)%}
+        {% if page_num%}
+            {% if posts.page == page_num %}
+                <a class = "btn btn-info mb-4"href= "{{ url_for('main.index', page=page_num)  }}">{{ page_num }}</a>
+            {% else %}
+                <a class = "btn btn-outline-info mb-4"href= "{{ url_for('main.index', page=page_num)  }}">{{ page_num }}</a>
+            {% endif %}
+        {% else %}
+        {% endif %}
+    {% endfor%}
+{% endblock content %}

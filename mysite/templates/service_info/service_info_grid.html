@@ -1,0 +1,21 @@
+{% extends "base/layout.html" %}
+{% block content %}
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for sfi in sf %}
+        <div class="col">
+        <div class="card" >
+            <div class="card-header"> Servicio </div>
+            <div class = "card-body">
+            <h5 class="card-title"><i class="{{ sfi.service_icon }}"></i> {{ sfi.service_name }}</h5>
+            <p class="card-text">{{ sfi.service_description }}</p>
+          </div>
+        </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+
+
+{% endblock%}

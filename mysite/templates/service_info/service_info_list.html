@@ -1,0 +1,14 @@
+{% extends "base/layout.html" %}
+{% block content %}
+
+
+{{ sf }}
+
+{% for table in table_lemmas %}
+    {{title_lemmas[loop.index]}}
+    {{ table|safe }}
+{% endfor %}
+
+
+
+{% endblock%}

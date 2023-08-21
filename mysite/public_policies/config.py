@@ -1,0 +1,3 @@
+EAI_USERNAME = 'hi@hadox.org'
+EAI_PASSWORD = 'RYD.Lq5Et4nT4T4'
+OPEN_AI_KEY = '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'
