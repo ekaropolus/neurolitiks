@@ -4,7 +4,7 @@ import pandas as pd
 import json
 from expertai.nlapi.cloud.client import ExpertAiClient
 from .config import EAI_USERNAME, EAI_PASSWORD, OPEN_AI_KEY
-from . import policies
+from . import policies, CLARIFAI_PAT
 import openai
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv()) # read local .env file
@@ -22,6 +22,8 @@ from langchain.python import PythonREPL
 
 from langchain.output_parsers import ResponseSchema
 from langchain.output_parsers import StructuredOutputParser
+
+from langchain.llms import Clarifai
 
 
 def analyze_text(text):
@@ -148,5 +150,28 @@ def agent(policy, lemmas):
         response = result.get("output")
 
         return response
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
+
+def query_policy(query):
+    try:
+
+        llm = Clarifai(pat=CLARIFAI_PAT, user_id='meta', app_id='Llama-2', model_id='llama2-70b-chat')
+
+        response_list = []
+
+        for policy_id, policy_data in policies.items():
+            query_goal = policy_data["customer_response"]["goal"]
+            query_target = policy_data["customer_response"]["target"]
+            query_indicator = policy_data["customer_response"]["indicator"]
+            text = f"""Give the public policy goal {query_goal}, target {query_target}, and indicator {query_indicator},
+            Create a Standard Operating Procedure (SOP) based on the following: {query}
+            """
+
+            response = llm(text)
+            response_list.append(response)
+
+        return response_list
+
     except Exception as e:
         return f"An error occurred: {str(e)}"

@@ -8,7 +8,7 @@ from flask_login import current_user, login_required
 from .api import get_penguins
 from .config import EAI_USERNAME, EAI_PASSWORD
 from . import policies
-from .utils import analyze_text, read_politics_data, merge_data, agent, chat
+from .utils import analyze_text, read_politics_data, merge_data, agent, chat, query_policy
 
 #NLP with expert.ai
 from expertai.nlapi.cloud.client import ExpertAiClient
@@ -123,3 +123,10 @@ def get_responses():
         return jsonify(policies)
     except Exception as e:
         return jsonify({"error": str(e)})
+
+@public_policies.route('/policy/query/', methods=['GET'])
+def policy_query_response():
+    query = request.args.get('query', '')
+    # Get the city response based on the query
+    response = query_policy(query)
+    return jsonify(response)
