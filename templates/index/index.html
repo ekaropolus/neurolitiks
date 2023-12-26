@@ -1,74 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Technology Roadmaps</title>
-    <!-- Include Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('main.static',filename='css/index_style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Neurolitiks - Revolutionizing Urban Governance</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Your custom CSS here -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container">
-                <a class="navbar-brand" href="#">Technology Roadmaps</a>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Neurolitiks</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Testimonials</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                </ul>
             </div>
-        </nav>
+        </div>
+    </nav>
+
+    <header class="container-fluid bg-primary text-white text-center py-4">
+        <h1 class="display-4">Neurolitiks</h1>
+        <p class="lead">Revolutionizing Urban Governance with AI-Powered Insights</p>
     </header>
 
-    <div class="container">
-        <!-- Explanation/Instructions -->
-        <div class="row mt-4">
-            <div class="col">
-                <h2>Welcome to the Technology Roadmaps Generator!</h2>
-                <p>Create roadmaps to evolve your SME into an IT-enabled enterprise, a data and analytics-enabled enterprise, or an artificial intelligence-enabled enterprise.</p>
-                <p>Simply enter the type of your business in the input field below (e.g., e-commerce, healthcare, manufacturing), click "Generate Roadmap," and explore the steps to transform your business.</p>
+    <section class="container my-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-3 mb-lg-0">
+                <img src="{{ url_for('static', filename='img/hero_shot_neurolitiks.png') }}" alt="Urban Skyline" class="img-fluid">
+            </div>
+            <div class="col-lg-6">
+                <h2 class="mb-4">Empower Your Policy Decisions with Advanced Data Analysis</h2>
+                <ul class="list-unstyled">
+                    <li class="mb-2">Advanced AI Analytics</li>
+                    <li class="mb-2">Real-Time Policy Impact Prediction</li>
+                    <li class="mb-2">Intuitive Interface</li>
+                    <li class="mb-2">Customized Solutions for Health and Education Policies</li>
+                    <li>Continuous Innovation</li>
+                </ul>
             </div>
         </div>
+    </section>
 
+    <section class="container my-5">
+        <h3 class="text-center mb-4">Testimonials</h3>
         <div class="row">
-            <form method="POST" action="/">
-                <input type="text" name="roadmap_prompt" placeholder="Enter type of business (e.g., e-commerce, healthcare, manufacturing)">
-                <button type="submit">Generate Roadmap</button>
-            </form>
-        </div>
-
-        <div class="row">
-            {% for roadmap in roadmaps %}
-            <div class="col-md-6">
-                <div class="card mt-4">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <span class="step-number">{{ roadmap['step_number'] }}</span>
-                            {{ roadmap['heading'] }}
-                        </h5>
-                        <h6 class="card-subtitle mb-2 text-muted">{{ roadmap['subheading'] }}</h6>
-                        <p class="card-text">{{ roadmap['description'] }}</p>
-                        <p><a href="#" class="card-link" onclick="flipCard(this)">Learn more</a></p>
-                        <p class="detailed-description" style="display: none;">{{ roadmap['detailed_description'] }}</p>
-                    </div>
-                </div>
+            <div class="col-md-6 mb-3">
+                <blockquote class="blockquote">
+                    <p class="mb-0">"Neurolitiks transformed how we approach urban planning. The insights are invaluable."</p>
+                    <footer class="blockquote-footer">Urban Policy Maker</footer>
+                </blockquote>
             </div>
-            {% endfor %}
+            <div class="col-md-6 mb-3">
+                <blockquote class="blockquote">
+                    <p class="mb-0">"Real-time data analysis has made our decision-making process much more efficient and effective."</p>
+                    <footer class="blockquote-footer">City Administrator</footer>
+                </blockquote>
+            </div>
         </div>
-    </div>
+    </section>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white text-center p-3 mt-5">
-        <div class="container">
-            <p>&copy; 2023 Hadox Human Networks</p>
+    <footer class="bg-dark text-white mt-4">
+        <div class="container-fluid py-3">
+            <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h5>About Neurolitiks</h5>
+                    <p class="small">Empowering urban governance with advanced AI-driven data analysis, shaping smarter cities of the future.</p>
+                </div>
+                <div class="col-md-3 mb-3 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white small">Home</a></li>
+                        <li><a href="#" class="text-white small">Features</a></li>
+                        <li><a href="#" class="text-white small">Testimonials</a></li>
+                        <li><a href="#" class="text-white small">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact Us</h5>
+                    <p class="small">Email: info@neurolitiks.com</p>
+                    <p class="small">Phone: +123 456 7890</p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center small py-2" style="background-color: rgba(0, 0, 0, 0.2);">
+            © 2023 Neurolitiks. All rights reserved.
         </div>
     </footer>
 
-    <!-- Include Bootstrap JS and custom script -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-    <script>
-        function flipCard(link) {
-            var cardBody = link.parentNode;
-            var detailedDescription = cardBody.querySelector('.detailed-description');
-            cardBody.classList.toggle('flipped');
-            detailedDescription.style.display = (detailedDescription.style.display === 'none') ? 'block' : 'none';
-        }
-    </script>
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
 </body>
 </html>

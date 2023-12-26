@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask import render_template, request, url_for
-from mysite.models.models import Post
-from mysite import dash_app
+# from mysite.models.models import Post
+# from mysite import dash_app
 
 
 main = Blueprint('main',__name__,template_folder='templates/', static_folder='static/')
@@ -9,18 +9,22 @@ main = Blueprint('main',__name__,template_folder='templates/', static_folder='st
 import openai
 # Set up OpenAI API credentials
 
-
 @main.route('/', methods=['GET', 'POST'])
 def index():
+    return render_template('index/index.html')
+
+
+
+@main.route('/business/maker/', methods=['GET', 'POST'])
+def index_a():
     if request.method == 'POST':
         roadmap_prompt = request.form['roadmap_prompt']
         roadmaps = generate_roadmap(roadmap_prompt)
     else:
         roadmaps = []
-    return render_template('index/index.html', roadmaps=roadmaps)
+    return render_template('index/business_maker.html', roadmaps=roadmaps)
 
 def generate_roadmap(roadmap_prompt):
-    openai.api_key = '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'
 
     # Prompt for generating roadmap
     prompt = f"""Write in Spanish.
@@ -57,22 +61,22 @@ def generate_roadmap(roadmap_prompt):
     return roadmap
 
 
-@main.route('/pp')
-def index_post():
-    page = request.args.get('page',1,type=int)
-    posts = Post.query.paginate(page = page, per_page = 1)
-    pages = [
-        {"name": "Details", "url": url_for("users.register", site_id="id")}
-    ]
-    return render_template("posts/posts_list.html", tittle = 'Home',posts=posts, pages=pages)
+# @main.route('/pp')
+# def index_post():
+#     page = request.args.get('page',1,type=int)
+#     posts = Post.query.paginate(page = page, per_page = 1)
+#     pages = [
+#         {"name": "Details", "url": url_for("users.register", site_id="id")}
+#     ]
+#     return render_template("posts/posts_list.html", tittle = 'Home',posts=posts, pages=pages)
 
 
 
 
-# Define a Flask route for the Dash app
-@main.route('/dash')
-def dash_app_route():
-    return dash_app.index()
+# # Define a Flask route for the Dash app
+# @main.route('/dash')
+# def dash_app_route():
+#     return dash_app.index()
 
 
 

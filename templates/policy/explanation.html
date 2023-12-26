@@ -1,0 +1,51 @@
+<!-- Offcanvas AI Explanation Sidebar -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="aiExplanationSidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasExampleLabel">AI Analysis</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <!-- Context Card -->
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">AI Analysis Context</h5>
+        <p class="card-text">Discover how we use advanced AI technologies to analyze public policies and evaluate their potential impact. Neurolitiks employs a combination of cutting-edge AI techniques to provide comprehensive insights into policy effectiveness.</p>
+      </div>
+    </div>
+
+    <!-- AI Techniques -->
+    <div class="mb-3">
+      <h6 class="mb-2">AI Techniques Used:</h6>
+      <ul>
+        <li><strong>NLP Analyzer AI:</strong> Our Natural Language Processing AI extracts key elements from public policies for further analysis.</li>
+        <li><strong>Graph-Network Analyzer:</strong> This AI maps policy elements onto a graph network to identify relationships and patterns.</li>
+        <li><strong>AI Autonomous Agent:</strong> An autonomous AI agent evaluates policies' potential based on information and network strength.</li>
+      </ul>
+    </div>
+
+    <!-- AI Parameters -->
+    <div class="mb-3">
+      <h6 class="mb-2">Adjust AI Parameters:</h6>
+      <div class="mb-3">
+        <label class="form-label">NLP Analyzer AI Sensitivity</label>
+        <input type="range" class="form-range" min="1" max="10" step="1" id="nlpSensitivitySlider">
+      </div>
+      <div class="mb-3">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="graphAnalyzerCheckbox">
+          <label class="form-check-label" for="graphAnalyzerCheckbox">
+            Enable Graph-Network Analyzer
+          </label>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">AI Autonomous Agent Confidence</label>
+        <input type="range" class="form-range" min="1" max="100" step="1" id="agentConfidenceSlider">
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <p>Customize these parameters to fine-tune the AI analysis and receive tailored insights for policy evaluation.</p>
+    </div>
+  </div>
+</div>

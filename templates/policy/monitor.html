@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>True Lens AI LLM Monitor</title>
+    <style>
+        /* Add CSS styles here for better styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .container {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .json-container {
+            white-space: pre-wrap;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>True Lens AI LLM Monitor</h1>
+        <p>Welcome to the True Lens AI Language Model (LLM) Monitor App.</p>
+        
+        <!-- Navigation Menu -->
+        <div class="button-container">
+            <a href="/home" class="button">Home</a>
+            <a href="/about" class="button">About</a>
+            <a href="/contact" class="button">Contact</a>
+        </div>
+        
+        <hr>
+        
+        <!-- Display the DataFrame -->
+        <h2>DataFrame Display</h2>
+        {{ dataframe | safe }}
+        
+        <!-- Interaction Button -->
+        <div class="button-container">
+            <button class="button" id="analyze-button">Analyze Text</button>
+        </div>
+        
+        <!-- Add any other elements or widgets here as needed -->
+    </div>
+    
+    <!-- JavaScript for interaction -->
+    <script>
+        document.getElementById("analyze-button").addEventListener("click", function() {
+            // Add JavaScript logic for text analysis or other actions here
+            alert("Analyzing text...");
+        });
+
+        // Expand/Collapse JSON
+        const jsonContainers = document.querySelectorAll(".json-container");
+        jsonContainers.forEach(container => {
+            const toggleButton = document.createElement("button");
+            toggleButton.textContent = "Toggle JSON";
+            toggleButton.className = "button";
+            toggleButton.style.marginTop = "10px";
+            container.parentElement.appendChild(toggleButton);
+
+            toggleButton.addEventListener("click", () => {
+                const isHidden = container.style.display === "none";
+                container.style.display = isHidden ? "block" : "none";
+            });
+        });
+    </script>
+</body>
+</html>
