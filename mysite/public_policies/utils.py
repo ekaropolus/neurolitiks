@@ -4,25 +4,31 @@ import pandas as pd
 import json
 from expertai.nlapi.cloud.client import ExpertAiClient
 from .config import EAI_USERNAME, EAI_PASSWORD, OPEN_AI_KEY
-from . import policies
+from . import policies, CLARIFAI_PAT, COHERE_API_KEY
 import openai
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv()) # read local .env file
 
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
+
 import warnings
 warnings.filterwarnings("ignore")
 
-from langchain.agents.agent_toolkits import create_python_agent
+from langchain.chains import LLMChain
+
+
 from langchain.agents import load_tools, initialize_agent
 from langchain.agents import AgentType
-from langchain.tools.python.tool import PythonREPLTool
-from langchain.python import PythonREPL
 
 from langchain.output_parsers import ResponseSchema
 from langchain.output_parsers import StructuredOutputParser
 
+from langchain.llms import Clarifai
+from langchain.llms import Cohere
+from langchain.llms import OpenAI
+
+import cohere
 
 def analyze_text(text):
     os.environ["EAI_USERNAME"] = EAI_USERNAME
@@ -63,7 +69,8 @@ def chat(content, lemmas):
         # Convert list of dictionaries to JSON string
         lemmas_json = json.dumps(lemmas_dict_list)
 
-        chat = ChatOpenAI(temperature=0.0, openai_api_key=OPEN_AI_KEY)
+        #chat = ChatOpenAI(temperature=0.0, openai_api_key=OPEN_AI_KEY)
+        chat = ChatOpenAI(temperature=0.0)
 
         goal_schema = ResponseSchema(name="goal",
                                      description="Please describe the primary goal or purpose of the policy you're proposing.")
@@ -126,7 +133,8 @@ def chat(content, lemmas):
 
 def agent(policy, lemmas):
     try:
-        llm = ChatOpenAI(temperature=0, openai_api_key=OPEN_AI_KEY)
+        #llm = ChatOpenAI(temperature=0, openai_api_key=OPEN_AI_KEY)
+        llm = Cohere(cohere_api_key=COHERE_API_KEY)
         tools = load_tools(["llm-math", "wikipedia"], llm=llm)
 
         agent = initialize_agent(
@@ -148,5 +156,56 @@ def agent(policy, lemmas):
         response = result.get("output")
 
         return response
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
+
+def query_policy_neurolitiks(query):
+    try:
+
+        #llm = Clarifai(pat=CLARIFAI_PAT, user_id='meta', app_id='Llama-2', model_id='llama2-70b-chat')
+        #llm = Clarifai(pat=CLARIFAI_PAT, user_id='tiiuae', app_id='falcon', model_id='falcon-40b-instruct')
+
+        llm = Cohere(cohere_api_key=COHERE_API_KEY)
+        response_list = []
+
+
+        for policy_id, policy_data in policies.items():
+            query_goal = policy_data["customer_response"]["goal"]
+            query_target = policy_data["customer_response"]["target"]
+            query_indicator = policy_data["customer_response"]["indicator"]
+            text = f"""Given the public policy goal {query_goal}, target {query_target}, and indicator {query_indicator},
+            Create a Standard Operating Procedure (SOP) based on the following: {query}
+            """
+            print(text)
+            response = llm(text)
+            response_list.append(response)
+
+        return response_list
+
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
+
+def query_policy_web(site):
+    try:
+        for policy_id, policy_data in policies.items():
+            query_goal = policy_data["customer_response"]["goal"]
+            query_target = policy_data["customer_response"]["target"]
+            query_indicator = policy_data["customer_response"]["indicator"]
+            text = f"""Give the public policy goal {query_goal}, target {query_target}, and indicator {query_indicator},
+            Check relevant information associated with
+            """
+            print(text)
+            co = cohere.Client('0dNxurtv9zd9t61b1HpH2EOp3SOywZ09JlWht0oo') # This is your trial API key
+            response = co.chat(
+            model='command',
+            message=text,
+            temperature=0.3,
+            prompt_truncation='auto',
+            citation_quality='accurate',
+            connectors=[{"id":"web-search","options":{"site": site}}],
+            documents=[]
+            )
+            return response.text
+
     except Exception as e:
         return f"An error occurred: {str(e)}"

@@ -1,14 +1,22 @@
 import os
 import json
 from flask import Blueprint, render_template, flash, request, jsonify
-from mysite import db
+# from mysite import db
 from .forms import Policy
-from mysite.models.models import Post
-from flask_login import current_user, login_required
+# from mysite.models.models import Post
+# from flask_login import current_user, login_required
 from .api import get_penguins
 from .config import EAI_USERNAME, EAI_PASSWORD
 from . import policies
-from .utils import analyze_text, read_politics_data, merge_data, agent, chat
+from .utils import analyze_text, read_politics_data, merge_data, agent, chat, query_policy_neurolitiks, query_policy_web
+import logging
+
+# Imports main tools:
+from trulens_eval import Feedback, OpenAI as fOpenAI, Tru
+tru = Tru()
+tru.reset_database()
+
+from trulens_eval import TruBasicApp
 
 #NLP with expert.ai
 from expertai.nlapi.cloud.client import ExpertAiClient
@@ -51,9 +59,9 @@ def policy():
         df_pl = pd.merge(df_politics_lemmas, df_lemmas, how='inner', on = 'value')
         df_ps = pd.merge(df_politics_syncons, df_syncons, how='inner', on = 'lemma')
 
-        post = Post(title= "Política Pública", content = form.comment.data, author = current_user, state = 'Mexico', level = 1)
-        db.session.add(post)
-        db.session.commit()
+        # post = Post(title= "Política Pública", content = form.comment.data, author = current_user, state = 'Mexico', level = 1)
+        # db.session.add(post)
+        # db.session.commit()
     elif request.method == 'GET':
            output = ""
     return render_template("policy/policy.html", \
@@ -88,7 +96,7 @@ def hello_machine_learning():
 def api_get_penguins():
     return get_penguins()
 
-@public_policies.route('/policy/ask/', methods=['GET', 'POST'])
+@public_policies.route('/policy/dashboard/', methods=['GET', 'POST'])
 def policy_view():
     try:
         output = ""
@@ -97,13 +105,21 @@ def policy_view():
         df_ps = pd.DataFrame()
         answer = ""
         agent_response = ""
+        # Initialize OpenAI-based feedback function collection class:
+        fopenai = fOpenAI()
+
+        # Define a relevance function from openai
+        f_relevance = Feedback(fopenai.relevance).on_input_output()
+        tru_llm_standalone_recorder = TruBasicApp(chat, app_id="Neurolitiks", feedbacks=[f_relevance])
 
         if request.method == "POST":
             text = form.comment.data
             output = analyze_text(text)
             df_politics_lemmas, df_politics_syncons = read_politics_data()
             df_pl, df_ps = merge_data(output, df_politics_lemmas, df_politics_syncons)
-            answer, agent_response = chat(form.comment.data, df_pl)
+            with tru_llm_standalone_recorder as recording:
+                answer, agent_response = tru_llm_standalone_recorder.app(form.comment.data, df_pl)
+            # answer, agent_response = chat(form.comment.data, df_pl)
 
         elif request.method == 'GET':
             output = ""
@@ -123,3 +139,21 @@ def get_responses():
         return jsonify(policies)
     except Exception as e:
         return jsonify({"error": str(e)})
+
+@public_policies.route('/policy/query/neurolitiks/', methods=['GET'])
+def policy_query_neurolitiks_response():
+    query = request.args.get('query', '')
+    # Get the city response based on the query
+    response = query_policy_neurolitiks(query)
+    return jsonify(response)
+
+@public_policies.route('/policy/query/web/', methods=['GET'])
+def policy_query_web_response():
+    query = request.args.get('query', '')
+    # Get the city response based on the query
+    response = query_policy_web(query)
+    return jsonify(response)
+
+@public_policies.route('/policy/TrueLens/monitor/')
+def truelens():
+    return render_template('policy/monitor.html', dataframe=tru.get_records_and_feedback(app_ids=[])[0].to_html(index=False))
