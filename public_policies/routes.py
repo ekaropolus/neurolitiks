@@ -117,9 +117,9 @@ def policy_view():
             output = analyze_text(text)
             df_politics_lemmas, df_politics_syncons = read_politics_data()
             df_pl, df_ps = merge_data(output, df_politics_lemmas, df_politics_syncons)
-            with tru_llm_standalone_recorder as recording:
-                answer, agent_response = tru_llm_standalone_recorder.app(form.comment.data, df_pl)
-            # answer, agent_response = chat(form.comment.data, df_pl)
+            #with tru_llm_standalone_recorder as recording:
+                #answer, agent_response = tru_llm_standalone_recorder.app(form.comment.data, df_pl)
+            answer, agent_response = chat(form.comment.data, df_pl)
 
         elif request.method == 'GET':
             output = ""
