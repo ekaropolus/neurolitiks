@@ -69,8 +69,8 @@ def chat(content, lemmas):
         # Convert list of dictionaries to JSON string
         lemmas_json = json.dumps(lemmas_dict_list)
 
-        #chat = ChatOpenAI(temperature=0.0, openai_api_key=OPEN_AI_KEY)
-        chat = ChatOpenAI(temperature=0.0)
+        chat = ChatOpenAI(temperature=0.0, openai_api_key=OPEN_AI_KEY)
+        #chat = ChatOpenAI(temperature=0.0)
 
         goal_schema = ResponseSchema(name="goal",
                                      description="Please describe the primary goal or purpose of the policy you're proposing.")
@@ -133,8 +133,8 @@ def chat(content, lemmas):
 
 def agent(policy, lemmas):
     try:
-        #llm = ChatOpenAI(temperature=0, openai_api_key=OPEN_AI_KEY)
-        llm = Cohere(cohere_api_key=COHERE_API_KEY)
+        llm = ChatOpenAI(temperature=0, openai_api_key=OPEN_AI_KEY)
+        #llm = Cohere(cohere_api_key=COHERE_API_KEY)
         tools = load_tools(["llm-math", "wikipedia"], llm=llm)
 
         agent = initialize_agent(

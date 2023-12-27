@@ -1,5 +1,3 @@
-# Global dictionary to store responses
-policies = {}
 import os
 from dotenv import load_dotenv
 
@@ -7,8 +5,9 @@ from dotenv import load_dotenv
 project_folder = os.path.expanduser('~/mysite')  # Adjust the path as needed
 load_dotenv(os.path.join(project_folder, '.env'))
 
-# Access environment variables
-CLARIFAI_PAT = os.environ.get("CLARIFAI_PAT")
-COHERE_API_KEY = os.environ.get("COHERE_API_KEY")
+# Now you can access the environment variables
+EAI_USERNAME = os.getenv("EAI_USERNAME")
+EAI_PASSWORD = os.getenv("EAI_PASSWORD")
+OPEN_AI_KEY = os.getenv("OPEN_AI_KEY")
 
 

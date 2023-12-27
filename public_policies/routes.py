@@ -106,11 +106,11 @@ def policy_view():
         answer = ""
         agent_response = ""
         # Initialize OpenAI-based feedback function collection class:
-        fopenai = fOpenAI()
+        # fopenai = fOpenAI()
 
         # Define a relevance function from openai
-        f_relevance = Feedback(fopenai.relevance).on_input_output()
-        tru_llm_standalone_recorder = TruBasicApp(chat, app_id="Neurolitiks", feedbacks=[f_relevance])
+        # f_relevance = Feedback(fopenai.relevance).on_input_output()
+        # tru_llm_standalone_recorder = TruBasicApp(chat, app_id="Neurolitiks", feedbacks=[f_relevance])
 
         if request.method == "POST":
             text = form.comment.data
