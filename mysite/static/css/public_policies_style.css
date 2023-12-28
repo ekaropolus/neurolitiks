@@ -1,0 +1,65 @@
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -15px;
+  margin-left: -15px;
+  display: none; /* Initially hidden */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#search-response-text {
+  white-space: pre-wrap; /* Allows text to wrap and preserves whitespace */
+  word-wrap: break-word; /* Breaks long words if necessary to fit within the container */
+  overflow-y: auto; /* Enables vertical scrolling if the text is too long */
+  max-height: 400px; /* Set a maximum height for the container */
+}
+
+/* Styling for lemma and syncon items */
+.lemma-item,
+.syncon-item {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.lemma-item:hover,
+.syncon-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Styling for lemma and syncon text */
+.lemma-item p,
+.syncon-item p {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+/* Styling for lemma and syncon headers */
+.lemma-item p:nth-child(odd),
+.syncon-item p:nth-child(odd) {
+  font-weight: bold;
+  color: #4285f4; /* Google blue color */
+}
+
+/* Styling for even lines (e.g., descriptions) */
+.lemma-item p:nth-child(even),
+.syncon-item p:nth-child(even) {
+  font-weight: normal;
+  color: #666;
+}

@@ -1,159 +1,218 @@
-import os
-import json
-from flask import Blueprint, render_template, flash, request, jsonify
-# from mysite import db
-from .forms import Policy
-# from mysite.models.models import Post
-# from flask_login import current_user, login_required
-from .api import get_penguins
-from .config import EAI_USERNAME, EAI_PASSWORD
+from flask import Blueprint, render_template, request, jsonify, current_app, url_for
+from .utils import analyze_text, read_politics_data, merge_data, chat, query_policy_neurolitiks, query_policy_web, mongo_policy
 from . import policies
-from .utils import analyze_text, read_politics_data, merge_data, agent, chat, query_policy_neurolitiks, query_policy_web
-import logging
-
-# Imports main tools:
-from trulens_eval import Feedback, OpenAI as fOpenAI, Tru
-tru = Tru()
-tru.reset_database()
-
-from trulens_eval import TruBasicApp
-
-#NLP with expert.ai
-from expertai.nlapi.cloud.client import ExpertAiClient
-
-#Data Science with pandas
 import pandas as pd
-import joblib
+import uuid  # Import the uuid module
+from bson.objectid import ObjectId
 
-public_policies = Blueprint('public_policies',__name__)
-
-@public_policies.route('/policy/new', methods=['GET', 'POST'])
-#@login_required
-def policy():
-    output = ""
-    form = Policy()
-    df_pl = pd.DataFrame()
-    df_ps = pd.DataFrame()
-
-    if request.method == "POST": #form.validate_on_submit():
-        flash('Your post has been created', 'success')
-        os.environ["EAI_USERNAME"] = EAI_USERNAME
-        os.environ["EAI_PASSWORD"] = EAI_PASSWORD
-        client = ExpertAiClient()
-        flash('Pasaste', 'info')
-
-            # prediction = request.form.get("Policy")
-        text = form.comment.data #prediction
-        language= 'es'
-        output = client.full_analysis(body={"document": {"text": text}}, params={'language': language})
-
-        fields = ['value', 'score']
-        df_lemmas = pd.DataFrame([{fn: getattr(f, fn) for fn in fields} for f in output.main_lemmas])
-
-        fields = ['lemma', 'score']
-        df_syncons = pd.DataFrame([{fn: getattr(f, fn) for fn in fields} for f in output.main_syncons])
-
-        df_politics_lemmas = pd.read_csv("/home/3karopolus/mysite/datasets/politic_lemas.csv")
-        df_politics_syncons = pd.read_csv("/home/3karopolus/mysite/datasets/politic_syncons.csv")
-
-        df_pl = pd.merge(df_politics_lemmas, df_lemmas, how='inner', on = 'value')
-        df_ps = pd.merge(df_politics_syncons, df_syncons, how='inner', on = 'lemma')
-
-        # post = Post(title= "Política Pública", content = form.comment.data, author = current_user, state = 'Mexico', level = 1)
-        # db.session.add(post)
-        # db.session.commit()
-    elif request.method == 'GET':
-           output = ""
-    return render_template("policy/policy.html", \
-                                table_lemmas=[df_pl.to_html(classes='table table-hover table-striped table-dark', table_id = "dtHorizontalVerticalExample")], \
-                                title_lemmas=df_pl.columns.values, \
-                                table_syncons=[df_ps.to_html(classes='table table-hover table-striped table-dark', table_id = "dtHorizontalVerticalExample" )], \
-                                title_syncons=df_ps.columns.values, \
-                                output = output, tittle = 'Crea una Política Pública',form=form)
-
-@public_policies.route('/app/penguins/', methods=['GET', 'POST'])
-def hello_machine_learning():
-    model_path = "mysite/models/clf.pkl"
-    if request.method == "POST":
-       # Unpickle classifier
-       clf = joblib.load(model_path)
-       # Get values through input bars
-       culmen_length_mm = request.form.get("culmen_length_mm")
-       culmen_depth_mm = request.form.get("culmen_depth_mm")
-       flipper_length_mm = request.form.get("flipper_length_mm")
-       body_mass_g = request.form.get("body_mass_g")
-       # Put inputs to dataframe
-       X = pd.DataFrame([[culmen_length_mm, culmen_depth_mm,flipper_length_mm,body_mass_g]], columns = ["culmen_length_mm", "culmen_depth_mm","flipper_length_mm","body_mass_g"])
-       # Get prediction
-       prediction = clf.predict(X)[0]
-    else:
-        prediction = ""
-    return render_template("penguins/penguins.html", tittle = '¿Quién es pingüino?', output = prediction)
+public_policies = Blueprint('public_policies', __name__)
 
 
 
-@public_policies.get('/get/penguins/')
-def api_get_penguins():
-    return get_penguins()
+@public_policies.route('/policy/query/neurolitiks/', methods=['GET'])
+def policy_query_neurolitiks_response():
+    """
+    Handle queries to Neurolitiks and return a JSON response.
+    """
 
-@public_policies.route('/policy/dashboard/', methods=['GET', 'POST'])
-def policy_view():
     try:
-        output = ""
-        form = Policy()
+        query = request.args.get('query', '')
         df_pl = pd.DataFrame()
         df_ps = pd.DataFrame()
-        answer = ""
-        agent_response = ""
-        # Initialize OpenAI-based feedback function collection class:
-        fopenai = fOpenAI()
+        output = analyze_text(query)
+        df_politics_lemmas, df_politics_syncons = read_politics_data()
+        df_pl, df_ps = merge_data(output, df_politics_lemmas, df_politics_syncons)
+        response = query_policy_neurolitiks(query)
+        answer, agent_response = chat(query, df_pl)
 
-        # Define a relevance function from openai
-        f_relevance = Feedback(fopenai.relevance).on_input_output()
-        tru_llm_standalone_recorder = TruBasicApp(chat, app_id="Neurolitiks", feedbacks=[f_relevance])
+        # Generate a UUID as the call_id
+        call_id = str(uuid.uuid4())
 
-        if request.method == "POST":
-            text = form.comment.data
-            output = analyze_text(text)
-            df_politics_lemmas, df_politics_syncons = read_politics_data()
-            df_pl, df_ps = merge_data(output, df_politics_lemmas, df_politics_syncons)
-            with tru_llm_standalone_recorder as recording:
-                answer, agent_response = tru_llm_standalone_recorder.app(form.comment.data, df_pl)
-            # answer, agent_response = chat(form.comment.data, df_pl)
+        # Convert df_pl and df_ps to dictionaries
+        df_pl_dict = df_pl.to_dict(orient='records')
+        df_ps_dict = df_ps.to_dict(orient='records')
 
-        elif request.method == 'GET':
-            output = ""
 
+        # Save the response, answer, and agent_response, as well as df_pl and df_ps in the policies dictionary
+        policies[call_id] = {
+            "query": query,
+            "response": response,
+            "answer": answer,
+            "agent_response": agent_response,
+            "lemmas": df_pl_dict,
+            "syncons": df_ps_dict
+        }
+
+        # Insert the document into the MongoDB collection
+        result = current_app.mongo_policies.policies.insert_one(policies[call_id])
+
+        # Retrieve the _id from the inserted document
+        policy_id = str(result.inserted_id)
+
+        return jsonify({"policy_id": policy_id})
     except Exception as e:
-        flash(f"An error occurred: {str(e)}", "error")
-
-    return render_template("policy/ask.html",
-                            table_lemmas=df_pl.to_html(),
-                            table_syncons=df_ps.to_html(),
-                            output=output, title='Crea una Política Pública', form=form, answer=answer, agent_response = agent_response)
+        print(str(e))
+        return jsonify({"error": str(e)})
 
 
-@public_policies.route('/policy/responses/', methods=['GET'])
+@public_policies.route('/policy/query/web/', methods=['GET'])
+def policy_query_web_response():
+    """
+    Handle queries to the web and return a JSON response.
+    """
+    try:
+        query = request.args.get('query', '')
+        response = query_policy_web(query)
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+@public_policies.route('/policy/TrueLens/monitor/')
+def truelens():
+    """
+    Placeholder for monitoring - should be updated to return a meaningful response.
+    """
+    return jsonify({"message": "Monitoring functionality not implemented yet."})
+
+@public_policies.route('/policy/policies/', methods=['GET'])
 def get_responses():
+    """
+    Get policy responses and return them as JSON.
+    """
     try:
         return jsonify(policies)
     except Exception as e:
         return jsonify({"error": str(e)})
 
-@public_policies.route('/policy/query/neurolitiks/', methods=['GET'])
-def policy_query_neurolitiks_response():
-    query = request.args.get('query', '')
-    # Get the city response based on the query
-    response = query_policy_neurolitiks(query)
-    return jsonify(response)
+# Route to get the query for a specific policy_id from MongoDB
+@public_policies.route('/policy/query/<string:policy_id>/query/', methods=['GET'])
+def get_query(policy_id):
+    try:
+        # Find the policy by policy_id in MongoDB
+        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        if policy:
+            return jsonify({"policy_id": policy_id, "query": policy.get("query")})
+        else:
+            return jsonify({"error": "Policy ID not found"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
-@public_policies.route('/policy/query/web/', methods=['GET'])
-def policy_query_web_response():
-    query = request.args.get('query', '')
-    # Get the city response based on the query
-    response = query_policy_web(query)
-    return jsonify(response)
+# Route to get the response for a specific policy_id from MongoDB
+@public_policies.route('/policy/query/<string:policy_id>/response/', methods=['GET'])
+def get_response(policy_id):
+    try:
+        # Find the policy by policy_id in MongoDB
+        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        if policy:
+            return jsonify({"policy_id": policy_id, "response": policy.get("response")})
+        else:
+            return jsonify({"error": "Policy ID not found"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
-@public_policies.route('/policy/TrueLens/monitor/')
-def truelens():
-    return render_template('policy/monitor.html', dataframe=tru.get_records_and_feedback(app_ids=[])[0].to_html(index=False))
+# Route to get the response for a specific policy_id from MongoDB
+@public_policies.route('/policy/query/<string:policy_id>/agent_response/', methods=['GET'])
+def get_agent_response(policy_id):
+    try:
+        # Find the policy by policy_id in MongoDB
+        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        if policy:
+            return jsonify({"policy_id": policy_id, "agent_response": policy.get("agent_response")})
+        else:
+            return jsonify({"error": "Policy ID not found"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+# Route to get the answer for a specific policy_id from MongoDB
+@public_policies.route('/policy/query/<string:policy_id>/answer/', methods=['GET'])
+def get_answer(policy_id):
+    try:
+        # Find the policy by policy_id in MongoDB
+        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        if policy:
+            return jsonify({"policy_id": policy_id, "answer": policy.get("answer")})
+        else:
+            return jsonify({"error": "Policy ID not found"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+# Route to get the lemmas for a specific policy_id from MongoDB
+@public_policies.route('/policy/query/<string:policy_id>/lemmas/', methods=['GET'])
+def get_lemmas(policy_id):
+    try:
+        # Find the policy by policy_id in MongoDB
+        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        if policy:
+            return jsonify({"policy_id": policy_id, "lemmas": policy.get("lemmas")})
+        else:
+            return jsonify({"error": "Policy ID not found"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+# Route to get the syncoms for a specific policy_id from MongoDB
+@public_policies.route('/policy/query/<string:policy_id>/syncons/', methods=['GET'])
+def get_syncoms(policy_id):
+    try:
+        # Find the policy by policy_id in MongoDB
+        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        if policy:
+            return jsonify({"policy_id": policy_id, "syncons": policy.get("syncons")})
+        else:
+            return jsonify({"error": "Policy ID not found"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# Route to list all available endpoints
+@public_policies.route('/policy/available-endpoints/', methods=['GET'])
+def list_available_endpoints():
+    try:
+        endpoints = {}
+
+        # Iterate through the registered routes and add their URLs to the endpoints dictionary
+        for rule in current_app.url_map.iter_rules():
+            if rule.endpoint.startswith('public_policies.get_'):
+                endpoint_name = rule.endpoint.split('public_policies.get_')[1]
+                endpoints[endpoint_name] = url_for(rule.endpoint, call_id='<call_id>')
+
+        return jsonify(endpoints)
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+@public_policies.route('/policy/dashboard/', methods=['GET', 'POST'])
+def policy_dashboard():
+    """
+    Render the policy dashboard template.
+    """
+    return render_template("policy/dashboard.html")
+
+@public_policies.route('/policy/query/mongo/<policy_id>', methods=['GET'])
+def get_policy_from_mongo(policy_id):
+    try:
+        # Get the policy by the specified ID
+        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        if policy:
+            # Convert ObjectId to a string for JSON serialization
+            policy["_id"] = str(policy["_id"])
+            return jsonify(policy)
+        else:
+            return jsonify({"message": f"No policy found with ID: {policy_id}"})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
+
+@public_policies.route('/policy/query/mongo/last', methods=['GET'])
+def get_last_policy_from_mongo():
+    try:
+        # Get the last policy if policy_id is -1
+        last_policy = current_app.mongo_policies.policies.find_one(sort=[("_id", -1)])
+        if last_policy:
+            # Convert ObjectId to a string for JSON serialization
+            last_policy["_id"] = str(last_policy["_id"])
+            return jsonify(last_policy)
+        else:
+            return jsonify({"message": "No policies found in MongoDB."})
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)})
+

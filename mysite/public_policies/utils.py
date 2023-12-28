@@ -30,6 +30,21 @@ from langchain.llms import OpenAI
 
 import cohere
 
+from pymongo import MongoClient, errors
+from pymongo.server_api import ServerApi
+
+def mongo_policy(app, policy):
+    try:
+        app.mongo_policies.policies.insert_one(policy)
+        return 'Insert successful'
+    except errors.ConnectionFailure as e:
+        return f'Connection failed: {str(e)}'
+    except errors.OperationFailure as e:
+        return f'OperationFailure failed: {str(e)}'
+    except Exception as e:
+       return f'Exception failed: {str(e)}'
+
+
 def analyze_text(text):
     os.environ["EAI_USERNAME"] = EAI_USERNAME
     os.environ["EAI_PASSWORD"] = EAI_PASSWORD
@@ -69,8 +84,8 @@ def chat(content, lemmas):
         # Convert list of dictionaries to JSON string
         lemmas_json = json.dumps(lemmas_dict_list)
 
-        #chat = ChatOpenAI(temperature=0.0, openai_api_key=OPEN_AI_KEY)
-        chat = ChatOpenAI(temperature=0.0)
+        chat = ChatOpenAI(temperature=0.0, openai_api_key=OPEN_AI_KEY)
+        #chat = ChatOpenAI(temperature=0.0)
 
         goal_schema = ResponseSchema(name="goal",
                                      description="Please describe the primary goal or purpose of the policy you're proposing.")
@@ -117,15 +132,6 @@ def chat(content, lemmas):
 
         agent_response = agent(output_dict, lemmas_dict_list)
 
-        policy_id = str(uuid.uuid4())
-        lemmas_columns = lemmas.columns.tolist()
-        policies[policy_id] =  {
-            'content': content,
-            'lemmas': lemmas_json,
-            'customer_response': output_dict,
-            'agent_response': agent_response
-        }
-
         return output_dict, agent_response
     except Exception as e:
         return f"An error occurred: {str(e)}", None
@@ -133,8 +139,8 @@ def chat(content, lemmas):
 
 def agent(policy, lemmas):
     try:
-        #llm = ChatOpenAI(temperature=0, openai_api_key=OPEN_AI_KEY)
-        llm = Cohere(cohere_api_key=COHERE_API_KEY)
+        llm = ChatOpenAI(temperature=0, openai_api_key=OPEN_AI_KEY)
+        #llm = Cohere(cohere_api_key=COHERE_API_KEY)
         tools = load_tools(["llm-math", "wikipedia"], llm=llm)
 
         agent = initialize_agent(
@@ -164,8 +170,9 @@ def query_policy_neurolitiks(query):
 
         #llm = Clarifai(pat=CLARIFAI_PAT, user_id='meta', app_id='Llama-2', model_id='llama2-70b-chat')
         #llm = Clarifai(pat=CLARIFAI_PAT, user_id='tiiuae', app_id='falcon', model_id='falcon-40b-instruct')
+        #llm = Cohere(cohere_api_key=COHERE_API_KEY)
 
-        llm = Cohere(cohere_api_key=COHERE_API_KEY)
+        llm = ChatOpenAI(temperature=0, openai_api_key=OPEN_AI_KEY)
         response_list = []
 
 
@@ -209,3 +216,4 @@ def query_policy_web(site):
 
     except Exception as e:
         return f"An error occurred: {str(e)}"
+

@@ -1,0 +1,12 @@
+{
+  "base_url": "/jupyterhub/user/3karopolus/",
+  "hostname": "127.0.0.1",
+  "notebook_dir": "/home/3karopolus",
+  "password": false,
+  "pid": 1,
+  "port": 59779,
+  "secure": false,
+  "sock": "",
+  "token": "",
+  "url": "http://127.0.0.1:59779/jupyterhub/user/3karopolus/"
+}

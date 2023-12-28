@@ -1,3 +1,13 @@
-EAI_USERNAME = 'hi@hadox.org'
-EAI_PASSWORD = 'RYD.Lq5Et4nT4T4'
-OPEN_AI_KEY = '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'
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+project_folder = os.path.expanduser('~/mysite')  # Adjust the path as needed
+load_dotenv(os.path.join(project_folder, '.env'))
+
+# Now you can access the environment variables
+EAI_USERNAME = os.getenv("EAI_USERNAME")
+EAI_PASSWORD = os.getenv("EAI_PASSWORD")
+OPEN_AI_KEY = os.getenv("OPEN_AI_KEY")
+
+
