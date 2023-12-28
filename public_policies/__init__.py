@@ -1,5 +1,3 @@
-# Global dictionary to store responses
-policies = {}
 import os
 from dotenv import load_dotenv
 
@@ -11,4 +9,5 @@ load_dotenv(os.path.join(project_folder, '.env'))
 CLARIFAI_PAT = os.environ.get("CLARIFAI_PAT")
 COHERE_API_KEY = os.environ.get("COHERE_API_KEY")
 
-
+# Global dictionary to store responses
+policies = {}
