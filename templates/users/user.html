@@ -5,10 +5,13 @@
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
+
     <!-- User Information Card -->
     <div class="card mb-3">
       <div class="card-body">
         <h5 class="card-title">SaaS Business Model</h5>
+        <button id="login-btn" type="button" class="btn btn-primary">Login</button>
+        <button id="logout-btn" type="button" class="btn btn-secondary" disabled>Logout</button>
         <p class="card-text">Welcome, [Username]! Here is your user information:</p>
         <ul>
           <li>Credits: [Credits Left]</li>
@@ -28,4 +31,5 @@
       </div>
     </div>
   </div>
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 </div>

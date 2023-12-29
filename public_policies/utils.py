@@ -35,7 +35,7 @@ from pymongo.server_api import ServerApi
 
 def mongo_policy(app, policy):
     try:
-        app.mongo_policies.policies.insert_one(policy)
+        app.mongo_neurolitiks.policies.insert_one(policy)
         return 'Insert successful'
     except errors.ConnectionFailure as e:
         return f'Connection failed: {str(e)}'

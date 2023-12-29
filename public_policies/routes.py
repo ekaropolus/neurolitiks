@@ -44,7 +44,7 @@ def policy_query_neurolitiks_response():
         }
 
         # Insert the document into the MongoDB collection
-        result = current_app.mongo_policies.policies.insert_one(policies[call_id])
+        result = current_app.mongo_neurolitiks.policies.insert_one(policies[call_id])
 
         # Retrieve the _id from the inserted document
         policy_id = str(result.inserted_id)
@@ -89,7 +89,7 @@ def get_responses():
 def get_query(policy_id):
     try:
         # Find the policy by policy_id in MongoDB
-        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        policy = current_app.mongo_neurolitiks.policies.find_one({"_id": ObjectId(policy_id)})
         if policy:
             return jsonify({"policy_id": policy_id, "query": policy.get("query")})
         else:
@@ -102,7 +102,7 @@ def get_query(policy_id):
 def get_response(policy_id):
     try:
         # Find the policy by policy_id in MongoDB
-        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        policy = current_app.mongo_neurolitiks.policies.find_one({"_id": ObjectId(policy_id)})
         if policy:
             return jsonify({"policy_id": policy_id, "response": policy.get("response")})
         else:
@@ -115,7 +115,7 @@ def get_response(policy_id):
 def get_agent_response(policy_id):
     try:
         # Find the policy by policy_id in MongoDB
-        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        policy = current_app.mongo_neurolitiks.policies.find_one({"_id": ObjectId(policy_id)})
         if policy:
             return jsonify({"policy_id": policy_id, "agent_response": policy.get("agent_response")})
         else:
@@ -128,7 +128,7 @@ def get_agent_response(policy_id):
 def get_answer(policy_id):
     try:
         # Find the policy by policy_id in MongoDB
-        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        policy = current_app.mongo_neurolitiks.policies.find_one({"_id": ObjectId(policy_id)})
         if policy:
             return jsonify({"policy_id": policy_id, "answer": policy.get("answer")})
         else:
@@ -141,7 +141,7 @@ def get_answer(policy_id):
 def get_lemmas(policy_id):
     try:
         # Find the policy by policy_id in MongoDB
-        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        policy = current_app.mongo_neurolitiks.policies.find_one({"_id": ObjectId(policy_id)})
         if policy:
             return jsonify({"policy_id": policy_id, "lemmas": policy.get("lemmas")})
         else:
@@ -154,7 +154,7 @@ def get_lemmas(policy_id):
 def get_syncoms(policy_id):
     try:
         # Find the policy by policy_id in MongoDB
-        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        policy = current_app.mongo_neurolitiks.policies.find_one({"_id": ObjectId(policy_id)})
         if policy:
             return jsonify({"policy_id": policy_id, "syncons": policy.get("syncons")})
         else:
@@ -190,7 +190,7 @@ def policy_dashboard():
 def get_policy_from_mongo(policy_id):
     try:
         # Get the policy by the specified ID
-        policy = current_app.mongo_policies.policies.find_one({"_id": ObjectId(policy_id)})
+        policy = current_app.mongo_neurolitiks.policies.find_one({"_id": ObjectId(policy_id)})
         if policy:
             # Convert ObjectId to a string for JSON serialization
             policy["_id"] = str(policy["_id"])
@@ -205,7 +205,7 @@ def get_policy_from_mongo(policy_id):
 def get_last_policy_from_mongo():
     try:
         # Get the last policy if policy_id is -1
-        last_policy = current_app.mongo_policies.policies.find_one(sort=[("_id", -1)])
+        last_policy = current_app.mongo_neurolitiks.policies.find_one(sort=[("_id", -1)])
         if last_policy:
             # Convert ObjectId to a string for JSON serialization
             last_policy["_id"] = str(last_policy["_id"])
