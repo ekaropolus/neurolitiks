@@ -1,0 +1,4 @@
+
+/nk_bots/bot.py
+/nk_bots/management/commands/run_bot.py
+/nk_bots/utils/config.py
